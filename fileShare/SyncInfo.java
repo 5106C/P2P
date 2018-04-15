@@ -48,6 +48,23 @@ public class SyncInfo {
         }
 	}
 	
-	//
+	// completedLabel
+	public void setCompletedLabel (int peerID) {
+		synchronized(completedLabel) {
+			completedLabel.set(peerID);
+		}
+	}
+	
+	public boolean allPeerComplete(int nPeers) {
+		synchronized(completedLabel) {
+			if (completedLabel.nextClearBit(0) >= nPeers) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+	
+	//bitfield
  }
 
