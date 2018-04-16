@@ -2,69 +2,77 @@ package fileShare;
 
 import java.util.BitSet;
 
-public class SyncInfo {
-	
-	/* instance variables */
-  private BitSet completedLabel;
-	private BitSet bitfield;
-	private boolean[] isInteresetedOnMe;
-	private boolean[] myInterest;
-	
-	/** constructor */
-	public SyncInfo(BitSet completedLabel, BitSet bitfield, boolean[] isInteresetedOnMe, boolean[] myInterest) {
-		 this.completedLabel = completedLabel;
-		 this.bitfield = bitfield;
-		 this.isInteresetedOnMe = isInteresetedOnMe;
-		 this.myInterest = myInterest;
-	}
-	
-	public BitSet getCompletedLabel() {
-		return completedLabel;
-	}
-	
-	public BitSet getBitField () {
-		return bitfield;
-	}
-	
-	public boolean[] getIsInterestedOnMe () {
-		return isInteresetedOnMe;
-	}
-	
-	public boolean[] getMyInterested () {
-		return myInterest;
-	}
-	
-	// isInterestedOnMe P2P Type2 & 3
-	public void setInterestedOnMe (int peerID, boolean onMe) {
-		synchronized (isInteresetedOnMe) {
-            isInteresetedOnMe[peerID] = onMe;
-        }
-	}
-	
-	// myInterested P2P Type4 & 5
-	public void setMyInterest (int peerID, boolean MyInt) {
-		synchronized (myInterest) {
-            myInterest[peerID] = MyInt;
-        }
-	}
-	
-	// completedLabel
-	public void setCompletedLabel (int peerID) {
-		synchronized(completedLabel) {
-			completedLabel.set(peerID);
-		}
-	}
-	
-	public boolean allPeerComplete(int nPeers) {
-		synchronized(completedLabel) {
-			if (completedLabel.nextClearBit(0) >= nPeers) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-	}
-	
-	//bitfield
- }
+import configuration.*;
 
+public class SyncInfo {
+	private BitSet completedPeers;
+	private BitSet bitfield;
+	private boolean[] want;
+	private boolean[] wanted;
+	private int numOfPeers;
+	private int numOfPiece;
+
+	public SyncInfo(Common common, PeerInfo peerinfo) {
+		numOfPeers = peerinfo.getAmount();
+		numOfPiece = common.getPieceAmount();
+		bitfield = new BitSet(numOfPiece);
+		completedPeers = new BitSet(numOfPeers);
+		want = new boolean[numOfPeers];
+		wanted = new boolean[numOfPeers];
+	}
+
+	public void updateCompletedPeers(int index) {
+		synchronized (completedPeers) {
+			completedPeers.set(index);
+		}
+	}
+
+	public void updateBitfield(int pieceIndex) {
+		synchronized (bitfield) {
+			bitfield.set(pieceIndex);
+		}
+	}
+
+	public void flipBitfield() {
+		synchronized (bitfield) {
+			bitfield.flip(0, numOfPiece);
+		}
+	}
+
+	public boolean allComplete() {
+		synchronized (completedPeers) {
+			return completedPeers.nextClearBit(0) >= numOfPeers;
+		}
+	}
+
+	public boolean isHostComplete() {
+		synchronized (bitfield) {
+			return bitfield.nextClearBit(0) >= numOfPiece;
+		}
+	}
+	
+	public boolean interest(int index) {
+		synchronized(want) {
+			return want[index];
+		}
+	}
+	
+	public boolean interested(int index) {
+		synchronized(wanted) {
+			return wanted[index];
+		}
+	}
+	
+	public void updateInterest(int index, boolean b) {
+		synchronized(want) {
+			want[index]=b;
+		}
+	}
+	
+	public void updateInterested(int index, boolean b) {
+		synchronized(wanted) {
+			wanted[index]=b;
+		}
+	}
+
+}
