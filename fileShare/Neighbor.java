@@ -81,7 +81,11 @@ public class Neighbor {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			} catch (SocketException e) {
+			   	// this is fine
+		       	} catch (EOFException e) {
+			   	// also fine
+		       	}
 		}
 	}
 
