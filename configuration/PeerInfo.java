@@ -10,17 +10,19 @@ import java.util.HashMap;
 import java.util.List;
 
 public class PeerInfo {
-	private int NoP;		  					//Number of Peers;
-	private HashMap<Integer, Integer> peerID;	//the ID and the associated index of a peer 
-	private List<String> HostName;				//the name associated with an given index
-	private List<Integer> PortNumber;			//the port# associated with an given index
-	private List<Boolean> HasFile;				//If a peer associated with an given index has the complete file
-	
+	private int NoP; // Number of Peers;
+	private HashMap<Integer, Integer> peerID; // the ID and the associated index of a peer
+	private List<String> HostName; // the name associated with an given index
+	private List<Integer> PortNumber; // the port# associated with an given index
+	private List<Boolean> HasFile; // If a peer associated with an given index has the complete file
+	private List<Integer> ID; // also need to get peerID with a given Index
+
 	public PeerInfo() {
 		peerID = new HashMap<>();
 		HostName = new ArrayList<>();
 		PortNumber = new ArrayList<>();
 		HasFile = new ArrayList<>();
+		ID = new ArrayList<>();
 		readConfig();
 	}
 
@@ -42,6 +44,7 @@ public class PeerInfo {
 				HostName.add(NoP, HN);
 				PortNumber.add(NoP, PN);
 				HasFile.add(NoP, HF);
+				ID.add(NoP, pID);
 				peerID.put(pID, NoP++);
 			}
 			br.close();
@@ -54,6 +57,8 @@ public class PeerInfo {
 			e.printStackTrace();
 		}
 	}
+	
+	
 
 	public boolean hasPeer(int peerID) {
 		return this.peerID.containsKey(peerID);
@@ -61,6 +66,10 @@ public class PeerInfo {
 
 	public int Indexof(int peerID) {
 		return this.peerID.get(peerID);
+	}
+	
+	public int getPeerID(int index) {
+		return ID.get(index);
 	}
 
 	public String HostNameof(int index) {

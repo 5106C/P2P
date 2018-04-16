@@ -7,13 +7,13 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Common {
-	private int NPN;			//Number of Preferred Neighbors
-	private int UI;				//Unchoking Interval  (unit: s)
-	private int OUI;			//Optimistic Unchoking Interval (unit: s)
+	private int NPN; // Number of Preferred Neighbors
+	private int UI; // Unchoking Interval (unit: s)
+	private int OUI; // Optimistic Unchoking Interval (unit: s)
 	private String FileName;
-	private int FileSize;		//unit byte
-	private int PieceSize;		//unit byte
-	
+	private int FileSize; // unit byte
+	private int PieceSize; // unit byte
+
 	public Common() {
 		readConfig();
 	}
@@ -74,11 +74,11 @@ public class Common {
 	}
 
 	public int getLastSize() {
-		return FileSize % PieceSize;
+		return FileSize % PieceSize == 0 ? PieceSize : FileSize % PieceSize;
 	}
 
-	public int getAmount() {
-		return getLastSize() == 0 ? FileSize / PieceSize : FileSize / PieceSize + 1;
+	public int getPieceAmount() {
+		return getLastSize() == PieceSize ? FileSize / PieceSize : FileSize / PieceSize + 1;
 	}
 
 	public String getFileName() {
