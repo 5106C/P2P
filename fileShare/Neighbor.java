@@ -98,7 +98,7 @@ public class Neighbor {
 		return obj;
 	}
 
-	/** associate the vey p2p to this neighbor instance */
+	/** associate the very p2p to this neighbor instance */
 	public void setP2P(P2P p2p) {
 		this.p2p = p2p;
 	}
