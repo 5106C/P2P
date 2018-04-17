@@ -9,6 +9,7 @@ public class SyncInfo {
 	private BitSet bitfield;
 	private boolean[] want;
 	private boolean[] wanted;
+	private boolean[] requested;
 	private int numOfPeers;
 	private int numOfPiece;
 
@@ -19,6 +20,19 @@ public class SyncInfo {
 		completedPeers = new BitSet(numOfPeers);
 		want = new boolean[numOfPeers];
 		wanted = new boolean[numOfPeers];
+		requested=new boolean[numOfPiece];
+	}
+	
+	public void updateRequested(int pieceIndex, boolean b) {
+		synchronized(requested) {
+			requested[pieceIndex]=b;
+		}
+	}
+	
+	public boolean getRequested(int pieceIndex) {
+		synchronized(requested) {
+			return requested[pieceIndex];
+		}
 	}
 	
 	public BitSet getCompletedPeers() {

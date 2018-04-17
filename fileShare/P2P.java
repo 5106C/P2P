@@ -15,11 +15,10 @@ public class P2P extends Thread {
 	private Neighbor neighbor;
 	private int hostID;
 	private boolean ischoked;
-	private boolean[] requested;		//if one piece is being requested;
 	private ConcurrentHashMap<Integer, Integer> downloadRate;
 	private ConcurrentHashMap<Integer, Neighbor> neighborInfo;
 
-	public P2P(Common common, PeerInfo peerinfo, SyncInfo syncinfo, int hostID, int neighborIndex, boolean[] requested, ConcurrentHashMap<Integer, Integer> downloadRate,
+	public P2P(Common common, PeerInfo peerinfo, SyncInfo syncinfo, int hostID, int neighborIndex, ConcurrentHashMap<Integer, Integer> downloadRate,
 	ConcurrentHashMap<Integer, Neighbor> neighborInfo) {
 		this.common = common;
 		this.peerinfo = peerinfo;

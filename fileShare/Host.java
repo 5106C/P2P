@@ -24,7 +24,6 @@ public class Host extends Thread {
 	private SyncInfo syncinfo;
 	private ConcurrentHashMap<Integer, Integer> downloadRate;
 	private ConcurrentHashMap<Integer, Neighbor> neighborInfo;
-	private boolean[] requested;
 	private FileProcess fp;
 
 	public Host(int peerID, Common common, PeerInfo peerinfo) {
@@ -113,7 +112,7 @@ public class Host extends Thread {
 					Neighbor neighbor = new Neighbor(common, peerinfo, neighborIndex, connection, in, out);
 					neighborInfo.put(neighborIndex, neighbor);
 					downloadRate.put(neighborIndex, 0);
-					P2P p2p = new P2P(common, peerinfo, syncinfo, hostID, neighborIndex, requested, downloadRate,
+					P2P p2p = new P2P(common, peerinfo, syncinfo, hostID, neighborIndex, downloadRate,
 							neighborInfo);
 					neighbor.setP2P(p2p);
 					p2p.start();
@@ -162,7 +161,7 @@ public class Host extends Thread {
 		Neighbor neighbor = new Neighbor(common, peerinfo, index, requestSocket, in, out);
 		neighborInfo.put(index, neighbor);
 		downloadRate.put(index, 0);
-		P2P p2p = new P2P(common, peerinfo, syncinfo, hostID, index, requested, downloadRate, neighborInfo);
+		P2P p2p = new P2P(common, peerinfo, syncinfo, hostID, index, downloadRate, neighborInfo);
 		neighbor.setP2P(p2p);
 		p2p.start();
 		System.out.println("Connected to peer" + peerID);
