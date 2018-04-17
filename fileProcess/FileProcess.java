@@ -21,8 +21,8 @@ public class FileProcess {
 		folder.mkdirs();
 		filename = common.getFileName();
 		filesize = common.getFileSize();
-		piecesize = common.getAmount();
-		numberofpieces = common.getAmount();
+		piecesize = common.getPieceSize();
+		numberofpieces = common.getPieceAmount();
 		lastsize = common.getLastSize();
 	}
 
@@ -45,7 +45,7 @@ public class FileProcess {
 			instream.close();
 			for (int i = 0; i < numberofpieces; i++) {
 				BufferedOutputStream outstream = new BufferedOutputStream(new FileOutputStream(filepath + i + ".part"));
-				if (i == numberofpieces - 1 && lastsize != 0)
+				if (i == numberofpieces - 1)
 					outstream.write(temp, piecesize * i, lastsize);
 				else {
 					outstream.write(temp, piecesize * i, piecesize);
@@ -68,19 +68,19 @@ public class FileProcess {
 			BufferedOutputStream outstream = new BufferedOutputStream(new FileOutputStream(directory + filename));
 			for (int i = 0; i < numberofpieces; i++) {
 				byte[] temp = new byte[piecesize];
-				BufferedInputStream instream = new BufferedInputStream(		//may need revising
-						new FileInputStream(directory + filename + i + ".part"));
-				if (i == numberofpieces - 1 && lastsize != 0) {
+				BufferedInputStream instream = new BufferedInputStream(
+						new FileInputStream(directory + filename + i + ".part")); // may need revising
+				if (i == numberofpieces - 1) {
 					instream.read(temp, 0, lastsize);
 					outstream.write(temp, 0, lastsize);
-				}
-				else {
+				} else {
 					instream.read(temp, 0, piecesize);
 					outstream.write(temp, 0, piecesize);
 				}
 				instream.close();
 				outstream.close();
 			}
+			System.out.println("File rebuilt successfully");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -90,9 +90,14 @@ public class FileProcess {
 		}
 	}
 
-	public void deletePieces() throws IOException {
-		for(int i=0;i<numberofpieces;i++) {
-			Files.deleteIfExists(Paths.get(directory+filename+i+".part"));
+	public void deletePieces() {
+		for (int i = 0; i < numberofpieces; i++) {
+			try {
+				Files.deleteIfExists(Paths.get(directory + filename + i + ".part"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 

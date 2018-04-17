@@ -20,10 +20,28 @@ public class SyncInfo {
 		want = new boolean[numOfPeers];
 		wanted = new boolean[numOfPeers];
 	}
+	
+	public BitSet getCompletedPeers() {
+		synchronized (completedPeers) {
+			return completedPeers;
+		}
+	}
 
 	public void updateCompletedPeers(int index) {
 		synchronized (completedPeers) {
 			completedPeers.set(index);
+		}
+	}
+	
+	public BitSet getBitfield() {
+		synchronized (bitfield) {
+			return bitfield;
+		}
+	}
+	
+	public boolean haspiecie(int pieceIndex) {
+		synchronized (bitfield) {
+			return bitfield.get(pieceIndex);
 		}
 	}
 

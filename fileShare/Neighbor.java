@@ -5,21 +5,20 @@ import java.net.Socket;
 import java.util.BitSet;
 import configuration.*;
 
-
 public class Neighbor {
-	private int peerID;     	//	
-	private int index;			//
+	private int peerID; //
+	private int index; //
 	private int portNum;
 	private String hostname;
-	private BitSet bitfield; 	// this is the neighbor's bitfield, not host's!
+	private BitSet bitfield; // this is the neighbor's bitfield, not host's!
 	private int numofpiece;
 	private Socket connection;
 	private P2P p2p;
 	ObjectInputStream in;
 	ObjectOutputStream out;
 
-	public Neighbor(Common common, PeerInfo peerinfo, int index, Socket connection, ObjectOutputStream out,
-			ObjectInputStream in) {
+	public Neighbor(Common common, PeerInfo peerinfo, int index, Socket connection, ObjectInputStream in,
+			ObjectOutputStream out) {
 		this.index = index;
 		this.peerID = peerinfo.getPeerID(index);
 		this.portNum = peerinfo.PortNumberof(index);
@@ -81,11 +80,7 @@ public class Neighbor {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (SocketException e) {
-			   	// this is fine
-		       	} catch (EOFException e) {
-			   	// also fine
-		       	}
+			}
 		}
 	}
 
