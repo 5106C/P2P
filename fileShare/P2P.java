@@ -1,5 +1,8 @@
 package fileShare;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,6 +22,9 @@ public class P2P extends Thread {
 	private ConcurrentHashMap<Integer, Integer> downloadRate;
 	private ConcurrentHashMap<Integer, Neighbor> neighborInfo;
 	private boolean handshakefirst;
+	
+	private String filePath;
+	private String fileName;
 
 	public P2P(Common common, PeerInfo peerinfo, SyncInfo syncinfo, int hostID, int neighborIndex,
 			ConcurrentHashMap<Integer, Integer> downloadRate, ConcurrentHashMap<Integer, Neighbor> neighborInfo,
@@ -35,6 +41,9 @@ public class P2P extends Thread {
 		this.handshakefirst = handshakefirst;
 		ischoked = true;
 		running = true;
+		filePath = System.getProperty("user.dir") + File.separator
+		            + "peer_" + hostID + File.separator;
+		fileName = common.getFileName();
 	}
 
 	public void stopRunning() {
@@ -124,14 +133,47 @@ public class P2P extends Thread {
 						sendMsg(notInterested);
 					}
 				}
-				
+				//request
 				else if(msg.getType() == 6) {
-					
+					//check if neighbor choked
+					if(!ischoked) {
+						int pieceIndex = byte2int(msg.getPayload());
+						ActualMessage piece = creatPieceMsg(pieceIndex);
+						sendMsg(piece);//send piece Msg
+					}
+				}
+				//piece
+				else if(msg.getType() == 7) {
+					//
 				}
 			}
 		}
 	}
 	
+	private ActualMessage creatPieceMsg(int pieceIndex) {
+		int size;
+		// check if pieceIndex is the last piece
+		if(pieceIndex < common.getPieceAmount() - 1) {
+			size = common.getFileSize(); 
+		} else {
+			size = common.getLastSize();
+		}
+		// create a byte[] with certain pieceSize
+		byte[] payload = new byte[size];
+		// try catch from .part
+		try {
+            File file = new File(filePath + fileName + pieceIndex + ".part");
+            FileInputStream fis = new FileInputStream(file);
+            fis.read(payload);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+		
+		//create pieceMessage
+		ActualMessage pieceMessgae = new ActualMessage(size + 1, 7, payload);
+		return pieceMessgae;
+	}
+
 	private boolean checkBitfield() {
 		BitSet hostBF=syncinfo.getBitfield();
 		BitSet neighborBF=neighbor.getBitfield();
