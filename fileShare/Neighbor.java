@@ -50,7 +50,13 @@ public class Neighbor {
 
 	public BitSet getBitfield() {
 		synchronized (bitfield) {
-			return bitfield;
+			return (BitSet) bitfield.clone();
+		}
+	}
+	
+	public void setBitfield(BitSet bitf) {
+		synchronized(bitfield) {
+			bitfield=bitf;
 		}
 	}
 
