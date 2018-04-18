@@ -113,7 +113,7 @@ public class Host extends Thread {
 					neighborInfo.put(neighborIndex, neighbor);
 					downloadRate.put(neighborIndex, 0);
 					P2P p2p = new P2P(common, peerinfo, syncinfo, hostID, neighborIndex, downloadRate,
-							neighborInfo);
+							neighborInfo,false);
 					neighbor.setP2P(p2p);
 					p2p.start();
 					System.out.println("Peer " + peerinfo.getPeerID(neighborIndex) + " is connected!");
@@ -161,7 +161,7 @@ public class Host extends Thread {
 		Neighbor neighbor = new Neighbor(common, peerinfo, index, requestSocket, in, out);
 		neighborInfo.put(index, neighbor);
 		downloadRate.put(index, 0);
-		P2P p2p = new P2P(common, peerinfo, syncinfo, hostID, index, downloadRate, neighborInfo);
+		P2P p2p = new P2P(common, peerinfo, syncinfo, hostID, index, downloadRate, neighborInfo, true);
 		neighbor.setP2P(p2p);
 		p2p.start();
 		System.out.println("Connected to peer" + peerID);
