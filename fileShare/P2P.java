@@ -32,8 +32,72 @@ public class P2P extends Thread {
 		running=true;
 	}
 
-	public void run() {
 		
+	public void run() {
+	    if(handshakefirst){
+	        creatnewhandshake(neighbor);
+            System.out.println(hostID +"send my handshake to "+neighborID );    //neighborID, peerID
+            writetolog(hostID+ "makes a connection to peer "+ neighborID);
+
+        }
+
+        while(running){
+	        Object messagereceived=null;
+	       try{
+	           messagereceived=neighbor.receive();
+
+//           } catch (IOException ioException) {
+//                ioException.printStackTrace();
+
+//	       } catch (ClassNotFoundException e) {
+//               System.err.println("Data received in unknown format!");
+           }
+
+           if (messagereceived instanceof HandShake){
+               if(!handshakeCheck((HandShake)messagereceived, neighbor)){
+                   break;
+               }
+	           if (!handshakefirst){
+	               creatnewhandshake();
+                   System.out.println(hostID+" send handshake to "+neighborID);
+                   
+                   int type=5;
+                   byte[] payload=bits2byte(syncinfo.getBitfield());
+                   int length=payload.length;
+                   ActualMessage bitfield= new ActualMessage(length, type, payload);
+                   sendMsg(bitfield);
+                   
+               }
+               
+           }
+           
+           if(messagereceived instanceof ActualMessage){
+	           ActualMessage msg=(ActualMessage)messagereceived;
+	           
+	           if (msg.getType()==2){
+	               syncinfo.updateInterested(neighborIndex, true);
+                   writetolog();
+	           }
+	           
+	           if(msg.getType()==3){
+	               syncinfo.updateInterested(neighborIndex,false);
+	               
+               }
+               
+               
+           }
+           
+           
+
+
+        }
+
+	}
+
+	public void stopRunning() {
+		running = false;
+	}
+
 
 	}
 
