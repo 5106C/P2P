@@ -49,7 +49,7 @@ public class SyncInfo {
 	
 	public BitSet getBitfield() {
 		synchronized (bitfield) {
-			return bitfield;
+			return (BitSet) bitfield.clone();
 		}
 	}
 	
