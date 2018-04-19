@@ -310,7 +310,7 @@ public class P2P extends Thread {
 
 	private void sendMsgAllPeer(ActualMessage havepiece){
 		for(Neighbor x : neighborInfo.values()) {
-			sendMsg(havepiece);
+			x.send(havepiece);
 		}
     	}
 }
