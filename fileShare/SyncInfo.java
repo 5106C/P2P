@@ -12,6 +12,7 @@ public class SyncInfo {
 	private boolean[] requested;
 	private int numOfPeers;
 	private int numOfPiece;
+	private boolean[] isChoke;
 
 	public SyncInfo(Common common, PeerInfo peerinfo) {
 		numOfPeers = peerinfo.getAmount();
@@ -21,6 +22,15 @@ public class SyncInfo {
 		want = new boolean[numOfPeers];
 		wanted = new boolean[numOfPeers];
 		requested=new boolean[numOfPiece];
+		isChoke = new boolean[numOfPiece];
+	}
+	
+	public boolean[] getIsChoke() {
+		return isChoke;
+	}
+	
+	public int getNumOfPeers() {
+		return numOfPeers;
 	}
 	
 	public void updateRequested(int pieceIndex, boolean b) {
