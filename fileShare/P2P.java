@@ -284,8 +284,9 @@ public class P2P extends Thread {
         	}
         	return bits;
 	}
+	
 	private void sendMsg(ActualMessage msg) {
-
+		neighborInfo.get(this.neighborIndex).send(msg);
 	}
 
 	private void writelog(String log) {
