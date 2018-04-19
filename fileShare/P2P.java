@@ -2,6 +2,7 @@ package fileShare;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,6 +19,7 @@ public class P2P extends Thread {
 	private int neighborIndex;
 	private Neighbor neighbor;
 	private int hostID;
+	private int hostIndex;
 	private boolean ischoked;
 	private ConcurrentHashMap<Integer, Integer> downloadRate;
 	private ConcurrentHashMap<Integer, Neighbor> neighborInfo;
@@ -28,7 +30,7 @@ public class P2P extends Thread {
 
 	public P2P(Common common, PeerInfo peerinfo, SyncInfo syncinfo, int hostID, int neighborIndex,
 			ConcurrentHashMap<Integer, Integer> downloadRate, ConcurrentHashMap<Integer, Neighbor> neighborInfo,
-			boolean handshakefirst) {
+			boolean handshakefirst,int hostIndex) {
 		this.common = common;
 		this.peerinfo = peerinfo;
 		this.syncinfo = syncinfo;
@@ -44,6 +46,7 @@ public class P2P extends Thread {
 		filePath = System.getProperty("user.dir") + File.separator
 		            + "peer_" + hostID + File.separator;
 		fileName = common.getFileName();
+		hostIndex=peerinfo.getPeerID(hostID);
 	}
 
 	public void stopRunning() {
@@ -136,15 +139,45 @@ public class P2P extends Thread {
 				//request
 				else if(msg.getType() == 6) {
 					//check if neighbor choked
-					if(!syncinfo.getIsChoke()[this.neighborIndex]) {
+					if(!ischoked) {
 						int pieceIndex = byte2int(msg.getPayload());
 						ActualMessage piece = creatPieceMsg(pieceIndex);
 						sendMsg(piece);//send piece Msg
 					}
 				}
+
 				//piece
 				else if(msg.getType() == 7) {
-					//
+
+					int pieceIndex=byte2int(msg.getIndex());
+					byte[] payload=msg.getPayload();
+					creatOnePiece(pieceIndex, payload);
+                    writelog("Peer " + hostID + " has downloaded the piece " + byte2int(msg.getIndex()) + " from " + neighbor.getPeerID());
+
+					int rate=downloadRate.get(neighborIndex);
+					downloadRate.replace(neighborIndex,rate+1);
+
+					ActualMessage havepiece=new ActualMessage(4,4,int2byte(pieceIndex));
+					sendMsgAllPeer(havepiece);
+
+                    syncinfo.updateBitfield(pieceIndex);
+                    if(syncinfo.isHostComplete()){
+                        syncinfo.updateCompletedPeers(hostIndex);
+                        break;
+                    }
+
+                    if(!checkBitfield()) {
+                        ActualMessage notinterested = new ActualMessage(4, 3, null);
+                        sendMsg(notinterested);
+                    }else{
+
+                        }
+
+
+
+
+                    }
+
 				}
 			}
 		}
@@ -174,6 +207,19 @@ public class P2P extends Thread {
 		return pieceMessgae;
 	}
 
+	private void creatOnePiece(int pieceIndex, byte[] payload){
+
+	    try {
+            File file = new File(filePath + fileName + pieceIndex + ".part");
+            FileOutputStream fileOuput = new FileOutputStream(file);
+            fileOuput.write(payload);
+
+        }catch(IOException e){
+	        e.printStackTrace();
+        }
+    }
+
+
 	private boolean checkBitfield() {
 		BitSet hostBF=syncinfo.getBitfield();
 		BitSet neighborBF=neighbor.getBitfield();
@@ -185,11 +231,23 @@ public class P2P extends Thread {
 
 	private boolean handshakeCheck(HandShake hs) {
 		// TODO Auto-generated method stub
+        boolean handshakeCheck=false;
+        //boolean idCheck=false;
+        String standardheader="P2PFILESHARINGPROJ";
+        String header=hs.getHeader();
+        int id=hs.getPeerID();
+        if((header.equals(standardheader)) && (( id==neighborID))){
+            handshakeCheck=true;
+        }
 
+        return handshakeCheck;
 	}
 
 	private void creatnewhandshake() {
 		// TODO Auto-generated method stub
+        String handshakeHeader="P2PFILESHARINGPROJ";
+        HandShake handShakemsg=new HandShake(handshakeHeader,neighborID);
+        neighbor.send(handShakemsg);
 
 	}
 
@@ -199,6 +257,8 @@ public class P2P extends Thread {
 
 	private byte[] int2byte(int i) {
 
+
+	    return
 	}
 
 	private int byte2int(byte[] b) {
@@ -220,5 +280,9 @@ public class P2P extends Thread {
 	private void writelog(String s) {
 
 	}
+
+	private void sendMsgAllPeer(ActualMessage havepiece){
+
+    }
 
 }
