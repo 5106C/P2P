@@ -203,7 +203,7 @@ public class P2P extends Thread {
         }
 		
 		//create pieceMessage
-		ActualMessage pieceMessgae = new ActualMessage(size + 1, 7, payload);
+		ActualMessage pieceMessgae = new ActualMessage(size + 1, 7, payload, int2byte(pieceIndex));
 		return pieceMessgae;
 	}
 
