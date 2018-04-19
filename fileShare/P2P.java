@@ -256,23 +256,34 @@ public class P2P extends Thread {
 	}
 
 	private byte[] int2byte(int i) {
-
-
-	    return
+		ByteBuffer settobyte = ByteBuffer.allocate(4);
+        	settobyte.putInt(i);
+        	return settobyte.array();
 	}
 
 	private int byte2int(byte[] b) {
-
+		return new BigInteger(b).intValue();
 	}
 
-	private byte[] bits2byte(BitSet bs) {
-
+	private byte[] bits2byte(BitSet bits) {
+		byte[] bytes = new byte[bits.length() / 8 + 1];
+        	for (int i = 0; i < bits.length(); i++) {
+            		if (bits.get(i)) {
+                	bytes[bytes.length - i / 8 - 1] |= 1 << ( i % 8 );
+            		}
+        	}
+        	return bytes;
 	}
 	
-	private BitSet byte2bits(byte[] b) {
-		
+	private BitSet byte2bits(byte[] bytes) {
+		BitSet bits = new BitSet();
+        	for (int i = 0; i < bytes.length * 8; i++) {
+            		if ((bytes[ bytes.length - i / 8 - 1 ] & ( 1 << ( i % 8 ))) > 0) {
+                		bits.set(i);
+            		}
+        	}
+        	return bits;
 	}
-
 	private void sendMsg(ActualMessage msg) {
 
 	}
