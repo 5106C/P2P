@@ -277,12 +277,27 @@ public class P2P extends Thread {
 
 	}
 
-	private void writelog(String s) {
-
+	private void writelog(String log) {
+        
+        	String logname= filePath+"log_peer_"+ hostID + ".log";
+        	try {
+            	SimpleDateFormat time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            	String logtime = time.format(new Date().getTime());
+            	log = "[" + logtime + "]: " + log;
+            	FileWriter fw = new FileWriter(new File(logname), true);
+            	PrintWriter pw = new PrintWriter(fw);
+            	pw.println(log);
+            	pw.flush();
+            	fw.flush();
+            	pw.close();
+            	fw.close();
+        	} catch (IOException e) {
+        	    e.printStackTrace();
+        	}
 	}
 
 	private void sendMsgAllPeer(ActualMessage havepiece){
 
-    }
+    	}
 
 }
