@@ -19,6 +19,7 @@ public class Choke extends Thread {
     private int optUnchokeInterval;
     private int numOfPreferedNerghbor;
     
+    private int numOfPeers;
     private int numOfNeighbors;
     private boolean[] isChoke;  // = new boolean[numOfNeighbors];
     
@@ -35,16 +36,17 @@ public class Choke extends Thread {
     public Choke(ConcurrentHashMap<Integer, Integer> downloadRate, ConcurrentHashMap<Integer, Neighbor> neighborsInfo,
 			SyncInfo syncInfo, Common common, int hostID) {
     	
+    	this.numOfPeers = syncInfo.getNumOfPeers();
         // peerInfo
         this.numOfNeighbors = neighborsInfo.size(); // what if size change?
         
         // syncInfo
-        for(int i = 0; i < numOfNeighbors; i++) {
+        for(int i = 0; i < this.numOfPeers; i++) {
         	wanted[i] = syncInfo.interested(i);
         }
         
-        isChoke = new boolean[numOfNeighbors];
-        for(int i = 0; i < isChoke.length; i++) {
+        isChoke = syncInfo.getIsChoke();
+        for(int i = 0; i < this.numOfPeers; i++) {
             isChoke[i] = true;
         } 
         
@@ -96,7 +98,7 @@ public class Choke extends Thread {
         if(numOfPreferedNerghbor == 0){
             System.out.println("process may finished");
         }
-        if(numOfPreferedNerghbor>numOfNeighbors){
+        if(numOfPreferedNerghbor > numOfNeighbors){
             System.out.println("Check the process");
         }
         
@@ -106,13 +108,13 @@ public class Choke extends Thread {
         while(running){
             try{
                 sleep(1000);
-            }catch (InterruptedException e){
+            }catch (InterruptedException e) {
                 e.printStackTrace();
             }
             count++;
             
             // unchoke Interval
-            if(count % unchokeInterval == 0){
+            if(count % unchokeInterval == 0) {
                 int logFlag = 0; // detect if chokeList changes
                 
                 //contain the index of neighbor interested in P
@@ -120,7 +122,7 @@ public class Choke extends Thread {
                 System.out.println(preferNeighbor);
                 
                 // check and choke unused Neighbors
-                for(int i = 0; i < isChoke.length; i++){
+                for(int i = 0; i < this.numOfPeers; i++){
                     if(!isChoke[i] && !preferNeighbor.contains(i) && i != optIndex){
                         isChoke[i] = true;
                         ActualMessage msg = new ActualMessage(1, 0, null);
@@ -164,7 +166,7 @@ public class Choke extends Thread {
                 
                 // create optUnchokeList, currently choke and wanted
                 List<Integer> optUnchokeList = new ArrayList<>();
-                for(int i = 0; i < numOfNeighbors; i++){
+                for(int i = 0; i < this.numOfPeers; i++){
                     if(isChoke[i] && wanted[i]) {
                         optUnchokeList.add(i);
                     }
