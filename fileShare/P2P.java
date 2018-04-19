@@ -139,7 +139,7 @@ public class P2P extends Thread {
 				//request
 				else if(msg.getType() == 6) {
 					//check if neighbor choked
-					if(!ischoked) {
+					if(!syncinfo.getIsChoke()[this.neighborIndex]) {
 						int pieceIndex = byte2int(msg.getPayload());
 						ActualMessage piece = creatPieceMsg(pieceIndex);
 						sendMsg(piece);//send piece Msg
