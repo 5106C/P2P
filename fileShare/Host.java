@@ -72,10 +72,11 @@ public class Host extends Thread {
 			System.out.println("Current completed peers: " + syncinfo.getCompletedPeers());
 			if (syncinfo.allComplete())
 				break;
-			if (!hasFile)
-				fp.rebuild();
-			fp.deletePieces();
+			syncinfo.resetRequested();
 		}
+		if (!hasFile)
+			fp.rebuild();
+		fp.deletePieces();
 		choke.stopRunning();
 		vs.stopRunning();
 		for (Neighbor n : neighborInfo.values())
