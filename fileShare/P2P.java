@@ -98,6 +98,7 @@ public class P2P extends Thread {
 					int length=1+4;
 					ActualMessage request = new ActualMessage(length, type, payload);
 					sendMsg(request);
+					syncinfo.updateRequested(pieceIndex,true);
 					String log="to do";
 					writelog(log);
 				}
