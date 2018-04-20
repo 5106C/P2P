@@ -146,37 +146,41 @@ public class P2P extends Thread {
 					}
 				}
 
-				//piece
-				else if(msg.getType() == 7) {
+                //piece
+                else if (msg.getType() == 7) {
 
-					int pieceIndex=byte2int(msg.getIndex());
-					byte[] payload=msg.getPayload();
-					creatOnePiece(pieceIndex, payload);
-                    writelog("Peer " + hostID + " has downloaded the piece " + byte2int(msg.getIndex()) + " from " + neighbor.getPeerID());
+                    int pieceIndex = byte2int(msg.getIndex());
+                    if(!syncinfo.haspiecie(pieceIndex)){
+                        byte[] payload = msg.getPayload();
+                        creatOnePiece(pieceIndex, payload);
+                        writelog("Peer " + hostID + " has downloaded the piece " + byte2int(msg.getIndex()) + " from " + neighbor.getPeerID());
+                    }
 
-					int rate=downloadRate.get(neighborIndex);
-					downloadRate.replace(neighborIndex,rate+1);
+                    int rate = downloadRate.get(neighborIndex);
+                    downloadRate.replace(neighborIndex, rate + 1);
 
-					ActualMessage havepiece=new ActualMessage(4,4,int2byte(pieceIndex));
-					sendMsgAllPeer(havepiece);
+                    ActualMessage havepiece = new ActualMessage(4, 4, int2byte(pieceIndex));
+                    sendMsgAllPeer(havepiece);
 
                     syncinfo.updateBitfield(pieceIndex);
-                    if(syncinfo.isHostComplete()){
+                    if (syncinfo.isHostComplete()) {
                         syncinfo.updateCompletedPeers(hostIndex);
                         break;
                     }
 
-                    if(!checkBitfield()) {
+                    if (!checkBitfield()) {
                         ActualMessage notinterested = new ActualMessage(4, 3, null);
                         sendMsg(notinterested);
-                    }else{
-
+                    } else {
+                        piecerequest = choosePiece();
+                        ActualMessage requestout = new ActualMessage(4, 6, piecerequest);
+                        if(!ischoked){
+                            sendMsg(requestout);
                         }
 
 
-
-
                     }
+                }
 
 				}
 			}
