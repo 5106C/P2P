@@ -173,22 +173,23 @@ public class P2P extends Thread {
                     }
 
 		    requestPiece.remove(pieceIndex);
-			
+
                     if (!checkBitfield()) {
                         ActualMessage notinterested = new ActualMessage(4, 3, null);
                         sendMsg(notinterested);
                     } else {
-                        piecerequest = choosePiece();
+                        byte[] piecerequest = int2byte(choosePiece());
                         ActualMessage requestout = new ActualMessage(4, 6, piecerequest);
-                        if(!ischoked){
+                        if (!ischoked) {
                             sendMsg(requestout);
                         }
-
-
                     }
-                }
+                    syncinfo.updateRequested(pieceIndex,true);
 
-				}
+                }
+                
+
+				
 			}
 		}
 	}
