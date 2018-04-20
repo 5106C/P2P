@@ -24,6 +24,7 @@ public class P2P extends Thread {
 	private ConcurrentHashMap<Integer, Integer> downloadRate;
 	private ConcurrentHashMap<Integer, Neighbor> neighborInfo;
 	private boolean handshakefirst;
+	private ArrayList<Integer> requestPiece;
 	
 	private String filePath;
 	private String fileName;
@@ -47,6 +48,7 @@ public class P2P extends Thread {
 		            + "peer_" + hostID + File.separator;
 		fileName = common.getFileName();
 		hostIndex=peerinfo.getPeerID(hostID);
+		requestPiece=new ArrayList<>();
 	}
 
 	public void stopRunning() {
@@ -125,6 +127,7 @@ public class P2P extends Thread {
 				else if(msg.getType() == 5) {
 					BitSet neighborBF=byte2bits(msg.getPayload());
 					neighbor.setBitfield(neighborBF);
+					setRequestPiece();
 					if(checkBitfield()) {
 						syncinfo.updateInterest(neighborIndex, true);
 						ActualMessage interested=new ActualMessage(1,2,null);						
@@ -254,9 +257,26 @@ public class P2P extends Thread {
         neighbor.send(handShakemsg);
 
 	}
+	
+	private void setRequestPiece() {
+		BitSet pieceList=neighbor.getBitfield();
+		pieceList.andNot(syncinfo.getBitfield());
+		int i=0;
+		while(true) {
+			i=pieceList.nextSetBit(i);
+			if(i==-1) break;
+			requestPiece.add(i++);
+		}
+	}
 
 	private int choosePiece() {
-
+		Random rd=new Random();
+		int pieceIndex;
+		while(true) {
+			pieceIndex=rd.nextInt(requestPiece.size());
+			if(!syncinfo.getRequested(pieceIndex)) break;
+		}
+		return pieceIndex;
 	}
 
 	private byte[] int2byte(int i) {
