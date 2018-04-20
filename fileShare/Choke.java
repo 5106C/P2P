@@ -41,6 +41,7 @@ public class Choke extends Thread {
         this.numOfNeighbors = neighborsInfo.size(); // what if size change?
         
         // syncInfo
+        wanted = new boolean[this.numOfPeers];
         for(int i = 0; i < this.numOfPeers; i++) {
         	wanted[i] = syncInfo.interested(i);
         }
