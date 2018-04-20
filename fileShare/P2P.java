@@ -172,6 +172,8 @@ public class P2P extends Thread {
                         break;
                     }
 
+		    requestPiece.remove(pieceIndex);
+			
                     if (!checkBitfield()) {
                         ActualMessage notinterested = new ActualMessage(4, 3, null);
                         sendMsg(notinterested);
