@@ -33,6 +33,11 @@ public class SyncInfo {
 		return numOfPeers;
 	}
 	
+	public void resetRequested() {
+		synchronized(requested) {
+			requested=new boolean[numOfPiece];
+		}
+	}
 	public void updateRequested(int pieceIndex, boolean b) {
 		synchronized(requested) {
 			requested[pieceIndex]=b;

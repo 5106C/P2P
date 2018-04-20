@@ -5,7 +5,7 @@ JFLAGS = -g
 	$(JC) $(JFLAGS) $*.java
 
 CLASSES = \
-	./message/Handshake.java \
+	./message/HandShake.java \
 	./message/ActualMessage.java \
 	./fileProcess/FileProcess.java \
 	./configuration/Common.java \

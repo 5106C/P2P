@@ -1,9 +1,9 @@
 package fileShare;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,7 +31,7 @@ public class P2P extends Thread {
 
 	public P2P(Common common, PeerInfo peerinfo, SyncInfo syncinfo, int hostID, int neighborIndex,
 			ConcurrentHashMap<Integer, Integer> downloadRate, ConcurrentHashMap<Integer, Neighbor> neighborInfo,
-			boolean handshakefirst,int hostIndex) {
+			boolean handshakefirst) {
 		this.common = common;
 		this.peerinfo = peerinfo;
 		this.syncinfo = syncinfo;
@@ -242,7 +242,7 @@ public class P2P extends Thread {
 	
 
 	private boolean handshakeCheck(HandShake hs) {
-		// TODO Auto-generated method stub
+		
         boolean handshakeCheck=false;
         //boolean idCheck=false;
         String standardheader="P2PFILESHARINGPROJ";
