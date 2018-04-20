@@ -29,13 +29,13 @@ public class Host extends Thread {
 	public Host(int peerID, Common common, PeerInfo peerinfo) {
 		this.common = common;
 		this.peerinfo = peerinfo;
-		SyncInfo syncinfo = new SyncInfo(common, peerinfo);
+		syncinfo = new SyncInfo(common, peerinfo);
 		downloadRate = new ConcurrentHashMap<>();
 		neighborInfo = new ConcurrentHashMap<>();
 		hostID = peerID;
 		hostIndex = peerinfo.Indexof(peerID);
-		portNumber = peerinfo.PortNumberof(peerID);
-		hasFile = peerinfo.HasFile(peerID);
+		portNumber = peerinfo.PortNumberof(hostIndex);
+		hasFile = peerinfo.HasFile(hostIndex);
 		numberofpeers = peerinfo.getAmount();
 		for (int i = 0; i < numberofpeers; i++) {
 			if (peerinfo.HasFile(i))
@@ -44,7 +44,6 @@ public class Host extends Thread {
 		try {
 			fp = new FileProcess(hostID, common);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if (hasFile) {
