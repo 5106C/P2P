@@ -77,9 +77,9 @@ public class FileProcess {
 					instream.read(temp, 0, piecesize);
 					outstream.write(temp, 0, piecesize);
 				}
-				instream.close();
-				outstream.close();
+				instream.close();	
 			}
+			outstream.close();
 			System.out.println("File rebuilt successfully");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
