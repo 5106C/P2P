@@ -119,6 +119,7 @@ public class P2P extends Thread {
 					neighbor.updateBitfield(pieceIndex);
 					if(neighbor.isComplete()) syncinfo.updateCompletedPeers(neighborIndex);
 					if(!syncinfo.haspiecie(pieceIndex)) {
+						requestPiece.add(pieceIndex);
 						ActualMessage interested=new ActualMessage(1,2,null);						
 						sendMsg(interested);
 					}
