@@ -21,7 +21,7 @@ public class Common {
 	private void readConfig() {
 		String filePath = System.getProperty("user.dir") + File.separator;
 		try {
-			FileReader fr = new FileReader(filePath + "PeerInfo.cfg");
+			FileReader fr = new FileReader(filePath + "Common.cfg");
 			BufferedReader br = new BufferedReader(fr);
 			while (true) {
 				String line = br.readLine();
