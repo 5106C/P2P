@@ -32,7 +32,7 @@ public class Common {
 					NPN = Integer.parseInt(info[1]);
 				else if (info[0].equals("UnchokingInterval"))
 					UI = Integer.parseInt(info[1]);
-				else if (info[0].equals("UOptimisticUnchokingInterval"))
+				else if (info[0].equals("OptimisticUnchokingInterval"))
 					OUI = Integer.parseInt(info[1]);
 				else if (info[0].equals("FileName"))
 					FileName = info[1];
