@@ -15,6 +15,7 @@ public class Choke extends Thread {
 	
     private volatile boolean running = true;
     
+    private SyncInfo syncInfo;
     private int unchokeInterval;
     private int optUnchokeInterval;
     private int numOfPreferedNerghbor;
@@ -27,7 +28,7 @@ public class Choke extends Thread {
     private int preOptIndex = -1; // detect if optNeighbor has changed
     
     private ConcurrentHashMap<Integer, Integer> downloadRate; // neighbor index -> sending rate in n of parts
-    private boolean[] wanted;
+    //private boolean[] wanted;
     private ConcurrentHashMap<Integer, Neighbor> neighborsInfo; // index -> peer info from PeerInfo.cfg
 
     private int hostID;
@@ -41,11 +42,8 @@ public class Choke extends Thread {
         this.numOfNeighbors = neighborsInfo.size(); // what if size change?
         
         // syncInfo
-        wanted = new boolean[this.numOfPeers];
-        for(int i = 0; i < this.numOfPeers; i++) {
-        	wanted[i] = syncInfo.interested(i);
-        }
-        
+        //wanted =syncInfo.interested(i);
+        this.syncInfo = syncInfo;
         isChoke = syncInfo.getIsChoke();
         for(int i = 0; i < this.numOfPeers; i++) {
             isChoke[i] = true;
@@ -103,7 +101,7 @@ public class Choke extends Thread {
             System.out.println("Check the process");
         }
         
-        int count = 1; // timer
+        int count = 0; // timer
         List<Integer> preferNeighbor = new LinkedList<>();
         
         while(running){
@@ -112,10 +110,10 @@ public class Choke extends Thread {
             }catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            count++;
+            
             
             // unchoke Interval
-            if(count % unchokeInterval == 0) {
+            if(count==0||count % unchokeInterval == 0) {
                 int logFlag = 0; // detect if chokeList changes
                 
                 //contain the index of neighbor interested in P
@@ -159,16 +157,16 @@ public class Choke extends Thread {
             }
 
             //optimistically unchoke interval
-            if(count % optUnchokeInterval == 0) {
+            if(count==0||count % optUnchokeInterval == 0) {
             
-                if(wanted.length == 0){
+                if(this.numOfPeers == 0){
                     System.out.println("all other peers have my messages");
                 }
                 
                 // create optUnchokeList, currently choke and wanted
                 List<Integer> optUnchokeList = new ArrayList<>();
                 for(int i = 0; i < this.numOfPeers; i++){
-                    if(isChoke[i] && wanted[i]) {
+                    if(isChoke[i] && syncInfo.interested(i)) {
                         optUnchokeList.add(i);
                     }
                 }
@@ -204,6 +202,7 @@ public class Choke extends Thread {
                 // reset preOptIndex
                 preOptIndex = optIndex;
             }
+            count++;
         }
     }
 
@@ -218,12 +217,14 @@ public class Choke extends Thread {
         }
         
         for (int k : downloadRate.keySet()) {
-            if(wanted[k]) {
+            if(syncInfo.interested(k)) {
                 maxRate.offer(new Pair(downloadRate.get(k), k));
+                System.out.println("eeee");
             }
             downloadRate.put(k, 0);
         }
-        
+        //System.out.println("maxRate: " maxRate);
+        //System.out.println(wanted);
         while (i < numOfPreferedNerghbor && !maxRate.isEmpty()) {
             ReMaxRate.add(maxRate.poll().index);
             i++;

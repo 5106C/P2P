@@ -95,7 +95,7 @@ public class Neighbor {
 		synchronized (in) {
 			try {
 				obj = in.readObject();
-			} catch (ClassNotFoundException | IOException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

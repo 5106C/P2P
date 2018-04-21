@@ -98,6 +98,7 @@ public class SyncInfo {
 		}
 	}
 	
+	
 	public boolean interest(int index) {
 		synchronized(want) {
 			return want[index];
