@@ -25,5 +25,5 @@ clean:
 	$(RM) *.class
 	$(RM) ./fileShare/*.class
 	$(RM) ./fileProcess/*.class
-	$(RM) ./fileShare/*.class
+	$(RM) ./configuration/*.class
 	$(RM) ./message/*.class
