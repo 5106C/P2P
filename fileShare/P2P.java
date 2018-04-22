@@ -28,8 +28,8 @@ public class P2P extends Thread {
 
 	private String filePath;
 	private String fileName;
-	private FileInputStream fi;
-	private FileOutputStream fo;
+	FileInputStream fi;
+	FileOutputStream fo;
 
 	public P2P(Common common, PeerInfo peerinfo, SyncInfo syncinfo, int hostID, int neighborIndex,
 			ConcurrentHashMap<Integer, Integer> downloadRate, ConcurrentHashMap<Integer, Neighbor> neighborInfo,
@@ -38,7 +38,9 @@ public class P2P extends Thread {
 		this.peerinfo = peerinfo;
 		this.syncinfo = syncinfo;
 		this.hostID = hostID;
+		hostIndex = peerinfo.Indexof(hostID);
 		this.neighborIndex = neighborIndex;
+		neighborID = this.peerinfo.getPeerID(neighborIndex);
 		this.neighborInfo = neighborInfo;
 		this.downloadRate = downloadRate;
 		neighborID = this.peerinfo.getPeerID(neighborIndex);
@@ -48,7 +50,7 @@ public class P2P extends Thread {
 		running = true;
 		filePath = System.getProperty("user.dir") + File.separator + "peer_" + hostID + File.separator;
 		fileName = common.getFileName();
-		hostIndex = peerinfo.Indexof(hostID);
+		requestPiece=new ArrayList<>();
 	}
 
 	public void stopRunning() {
@@ -139,6 +141,7 @@ public class P2P extends Thread {
 				}
 				// bitfield
 				else if (msg.getType() == 5) {
+//					neighbor.updateHandShake();
 					BitSet neighborBF = byte2bits(msg.getPayload());
 					neighbor.setBitfield(neighborBF);
 					if (neighbor.isComplete())
@@ -185,11 +188,11 @@ public class P2P extends Thread {
 							syncinfo.updateCompletedPeers(hostIndex);
 							continue;
 						}
-						if (!checkInterest()) {
-							ActualMessage notinterested = new ActualMessage(1, 3, null);
-							sendMsg(notinterested);
-							continue;
-						}
+					}
+					if (!checkInterest()) {
+						ActualMessage notinterested = new ActualMessage(1, 3, null);
+						sendMsg(notinterested);
+						continue;
 					}
 					int rate = downloadRate.get(neighborIndex);
 					downloadRate.replace(neighborIndex, rate + 1);
@@ -208,27 +211,26 @@ public class P2P extends Thread {
 	private ActualMessage creatPieceMsg(int pieceIndex) {
 		int size = common.getPieceSize();
 		// create a byte[] with certain pieceSize
-		byte[] payload = new byte[size];
+		byte[] pl = new byte[size];
 		// try catch from .part
 		try {
-			File file = new File(filePath + fileName + pieceIndex + ".part");
-			fi = new FileInputStream(file);
-			fi.read(payload);
+			fi = new FileInputStream(filePath + fileName + pieceIndex + ".part");
+			fi.read(pl);
 			fi.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		// create pieceMessage
-		ActualMessage pieceMessgae = new ActualMessage(size + 5, 7, int2byte(pieceIndex), payload);
+		ActualMessage pieceMessgae = new ActualMessage(size + 5, 7, int2byte(pieceIndex), pl);
 		return pieceMessgae;
 	}
 
 	private void downloadPiece(ActualMessage msg) {
 		int pieceIndex = byte2int(msg.getIndex());
+		byte[] pl = msg.getPayload();
 		try {
-			File file = new File(filePath + fileName + pieceIndex + ".part");
-			fo = new FileOutputStream(file);
-			fo.write(msg.getPayload());
+			fo = new FileOutputStream(filePath + fileName + pieceIndex + ".part");
+			fo.write(pl);
 			fo.flush();
 			fo.close();
 		} catch (IOException e) {
@@ -301,6 +303,7 @@ public class P2P extends Thread {
 		int pieceIndex;
 		while (true) {
 			pieceIndex = requestPiece.get(rd.nextInt(requestPiece.size()));
+			if(syncinfo.haspiecie(pieceIndex)) continue;
 			if (!syncinfo.getRequested(pieceIndex))
 				break;
 		}
@@ -362,7 +365,8 @@ public class P2P extends Thread {
 
 	private void sendMsgAllPeer(ActualMessage havepiece) {
 		for (Neighbor x : neighborInfo.values()) {
-			x.send(havepiece);
+//			if (x.isHandShaked())
+				x.send(havepiece);
 			// String log="Peer "+hostID+" sent 'have'"+byte2int(havepiece.getPayload())+"
 			// to peer "+x.getPeerID();
 			// writelog(log);

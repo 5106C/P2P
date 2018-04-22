@@ -61,7 +61,9 @@ public class Host extends Thread {
 		Choke choke = new Choke(downloadRate, neighborInfo, syncinfo, common, hostID, peerinfo);
 		choke.start();
 		VirtualServer vs = new VirtualServer();
-		vs.start();
+		if (hostIndex < peerinfo.getAmount() - 1) {
+			vs.start();
+		}
 		while (true) {
 			syncinfo.resetRequested();
 			try {
@@ -76,19 +78,21 @@ public class Host extends Thread {
 			}
 		}
 		try {
-			sleep(3000);
+			sleep(5000);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
 		choke.stopRunning();
-		vs.stopRunning();
+		if (hostIndex < peerinfo.getAmount() - 1) {
+			vs.stopRunning();
+		}
 		for (Neighbor n : neighborInfo.values())
 			n.closeConnection();
 		if (!hasFile)
 			fp.rebuild();
 		fp.delete();
 		try {
-			sleep(3000);
+			sleep(1000);
 			System.out.println("game over!");
 			System.exit(0);
 		} catch (InterruptedException e) {
@@ -119,11 +123,12 @@ public class Host extends Thread {
 					Neighbor neighbor = new Neighbor(common, peerinfo, neighborIndex, connection, in, out);
 					downloadRate.put(neighborIndex, 0);
 					neighborInfo.put(neighborIndex, neighbor);
-					P2P p2p = new P2P(common, peerinfo, syncinfo, hostID, neighborIndex, downloadRate,
-							neighborInfo,false);
+					P2P p2p = new P2P(common, peerinfo, syncinfo, hostID, neighborIndex, downloadRate, neighborInfo,
+							false);
 					neighbor.setP2P(p2p);
 					p2p.start();
-					System.out.println("Peer "+hostID+" is connected from peer "+ peerinfo.getPeerID(neighborIndex));
+					System.out
+							.println("Peer " + hostID + " is connected from peer " + peerinfo.getPeerID(neighborIndex));
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -137,7 +142,7 @@ public class Host extends Thread {
 				listener.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-//				e.printStackTrace();
+				// e.printStackTrace();
 			}
 		}
 
@@ -171,6 +176,6 @@ public class Host extends Thread {
 		P2P p2p = new P2P(common, peerinfo, syncinfo, hostID, index, downloadRate, neighborInfo, true);
 		neighbor.setP2P(p2p);
 		p2p.start();
-		System.out.println("peer "+hostID+"makes a connection to peer " + peerID);
+		System.out.println("peer " + hostID + "makes a connection to peer " + peerID);
 	}
 }
