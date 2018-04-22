@@ -90,7 +90,8 @@ public class FileProcess {
 		}
 	}
 
-	public void deletePieces() {
+	public void delete() {
+		System.out.println("begin to delete");
 		for (int i = 0; i < numberofpieces; i++) {
 			try {
 				Files.deleteIfExists(Paths.get(directory + filename + i + ".part"));
@@ -99,6 +100,7 @@ public class FileProcess {
 				e.printStackTrace();
 			}
 		}
+		System.out.println("all parts deleted");
 	}
 
 	public int getFilesize() {

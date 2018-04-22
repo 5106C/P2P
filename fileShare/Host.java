@@ -58,30 +58,38 @@ public class Host extends Thread {
 		for (int i = 0; i < hostIndex; i++) {
 			connect(i);
 		}
-		Choke choke = new Choke(downloadRate, neighborInfo, syncinfo, common, hostID);
+		Choke choke = new Choke(downloadRate, neighborInfo, syncinfo, common, hostID, peerinfo);
 		choke.start();
 		VirtualServer vs = new VirtualServer();
 		vs.start();
 		while (true) {
+			syncinfo.resetRequested();
 			try {
 				sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			System.out.println("Current completed peers: " + syncinfo.getCompletedPeers());
-			if (syncinfo.allComplete())
+			if (syncinfo.allComplete()) {
+				System.out.println("mission complete! please wait till programs end.");
 				break;
+			}
 		}
-		if (!hasFile)
-			fp.rebuild();
-		fp.deletePieces();
+		try {
+			sleep(3000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 		choke.stopRunning();
 		vs.stopRunning();
 		for (Neighbor n : neighborInfo.values())
 			n.closeConnection();
+		if (!hasFile)
+			fp.rebuild();
+		fp.delete();
 		try {
-			sleep(5000);
-			System.out.println("mission complete!");
+			sleep(3000);
+			System.out.println("game over!");
 			System.exit(0);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -109,13 +117,13 @@ public class Host extends Thread {
 					ObjectInputStream in = new ObjectInputStream(connection.getInputStream());
 					int neighborIndex = ++numberofconnected;
 					Neighbor neighbor = new Neighbor(common, peerinfo, neighborIndex, connection, in, out);
-					neighborInfo.put(neighborIndex, neighbor);
 					downloadRate.put(neighborIndex, 0);
+					neighborInfo.put(neighborIndex, neighbor);
 					P2P p2p = new P2P(common, peerinfo, syncinfo, hostID, neighborIndex, downloadRate,
 							neighborInfo,false);
 					neighbor.setP2P(p2p);
 					p2p.start();
-					System.out.println("Peer " + peerinfo.getPeerID(neighborIndex) + " is connected!");
+					System.out.println("Peer "+hostID+" is connected from peer "+ peerinfo.getPeerID(neighborIndex));
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -129,7 +137,7 @@ public class Host extends Thread {
 				listener.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+//				e.printStackTrace();
 			}
 		}
 
@@ -158,11 +166,11 @@ public class Host extends Thread {
 			e.printStackTrace();
 		}
 		Neighbor neighbor = new Neighbor(common, peerinfo, index, requestSocket, in, out);
-		neighborInfo.put(index, neighbor);
 		downloadRate.put(index, 0);
+		neighborInfo.put(index, neighbor);
 		P2P p2p = new P2P(common, peerinfo, syncinfo, hostID, index, downloadRate, neighborInfo, true);
 		neighbor.setP2P(p2p);
 		p2p.start();
-		System.out.println("Connected to peer" + peerID);
+		System.out.println("peer "+hostID+"makes a connection to peer " + peerID);
 	}
 }

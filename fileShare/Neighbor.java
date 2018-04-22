@@ -53,10 +53,10 @@ public class Neighbor {
 			return (BitSet) bitfield.clone();
 		}
 	}
-	
+
 	public void setBitfield(BitSet bitf) {
-		synchronized(bitfield) {
-			bitfield=bitf;
+		synchronized (bitfield) {
+			bitfield = bitf;
 		}
 	}
 
@@ -95,9 +95,10 @@ public class Neighbor {
 		synchronized (in) {
 			try {
 				obj = in.readObject();
-			} catch (Exception e) {
+			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			} catch (IOException e) {
 			}
 		}
 		return obj;

@@ -45,9 +45,9 @@ public class SyncInfo {
 	}
 	
 	public boolean getRequested(int pieceIndex) {
-		synchronized(requested) {
+//		synchronized(requested) {
 			return requested[pieceIndex];
-		}
+//		}
 	}
 	
 	public BitSet getCompletedPeers() {
@@ -69,9 +69,7 @@ public class SyncInfo {
 	}
 	
 	public boolean haspiecie(int pieceIndex) {
-		synchronized (bitfield) {
 			return bitfield.get(pieceIndex);
-		}
 	}
 
 	public void updateBitfield(int pieceIndex) {
@@ -100,15 +98,15 @@ public class SyncInfo {
 	
 	
 	public boolean interest(int index) {
-		synchronized(want) {
+//		synchronized(want) {
 			return want[index];
-		}
+//		}
 	}
 	
 	public boolean interested(int index) {
-		synchronized(wanted) {
+//		synchronized(wanted) {
 			return wanted[index];
-		}
+//		}
 	}
 	
 	public void updateInterest(int index, boolean b) {

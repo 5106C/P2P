@@ -19,7 +19,7 @@ public class ActualMessage implements Serializable {
 		payload = pl;
 	}
 	
-	public ActualMessage(int l, int t, byte[] pl, byte[] in) {
+	public ActualMessage(int l, int t, byte[] in, byte[] pl) {
 		length = l;
 		type = t;
 		payload = pl;
