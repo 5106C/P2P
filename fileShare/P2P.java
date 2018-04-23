@@ -50,7 +50,7 @@ public class P2P extends Thread {
 		running = true;
 		filePath = System.getProperty("user.dir") + File.separator + "peer_" + hostID + File.separator;
 		fileName = common.getFileName();
-		requestPiece=new ArrayList<>();
+		requestPiece = new ArrayList<>();
 	}
 
 	public void stopRunning() {
@@ -97,15 +97,13 @@ public class P2P extends Thread {
 					ischoked = false;
 					String log = "Peer " + hostID + " is unchoked by Peer " + this.neighborID;
 					writelog(log);
-					if (!syncinfo.interest(neighborIndex))
-						continue;
 					int pieceIndex = choosePiece();
 					byte[] payload = int2byte(pieceIndex);
 					int type = 6;
 					int length = 1 + 4;
 					ActualMessage request = new ActualMessage(length, type, payload);
 					sendMsg(request);
-					syncinfo.updateRequested(pieceIndex, true);
+					// syncinfo.updateRequested(pieceIndex, true);
 					String log2 = "sent a request of piece " + pieceIndex + " to peer " + neighborID;
 					writelog(log2);
 				}
@@ -141,7 +139,7 @@ public class P2P extends Thread {
 				}
 				// bitfield
 				else if (msg.getType() == 5) {
-//					neighbor.updateHandShake();
+					// neighbor.updateHandShake();
 					BitSet neighborBF = byte2bits(msg.getPayload());
 					neighbor.setBitfield(neighborBF);
 					if (neighbor.isComplete())
@@ -178,7 +176,6 @@ public class P2P extends Thread {
 						ActualMessage havepiece = new ActualMessage(4 + 1, 4, int2byte(pieceIndex));
 						sendMsgAllPeer(havepiece);
 						syncinfo.updateBitfield(pieceIndex);
-						updateRequestPiece();
 						if (syncinfo.isHostComplete()) {
 							// int type = 5;
 							// byte[] pl = bits2byte(syncinfo.getBitfield());
@@ -196,13 +193,12 @@ public class P2P extends Thread {
 					}
 					int rate = downloadRate.get(neighborIndex);
 					downloadRate.replace(neighborIndex, rate + 1);
+					updateRequestPiece();
 					int chosenPiece = choosePiece();
 					byte[] payload = int2byte(chosenPiece);
 					ActualMessage request = new ActualMessage(4 + 1, 6, payload);
-					if (!ischoked) {
-						sendMsg(request);
-						syncinfo.updateRequested(chosenPiece, true);
-					}
+					sendMsg(request);
+					syncinfo.updateRequested(chosenPiece, true);
 				}
 			}
 		}
@@ -249,10 +245,10 @@ public class P2P extends Thread {
 				break;
 			requestPiece.add(i++);
 		}
-		if (requestPiece.isEmpty())
-			syncinfo.updateInterest(neighborIndex, false);
-		else
-			syncinfo.updateInterest(neighborIndex, true);
+		// if (requestPiece.isEmpty())
+		// syncinfo.updateInterest(neighborIndex, false);
+		// else
+		// syncinfo.updateInterest(neighborIndex, true);
 	}
 
 	private void updateRequestPiece() {
@@ -264,17 +260,17 @@ public class P2P extends Thread {
 					break;
 			}
 		}
-		if (requestPiece.isEmpty())
-			syncinfo.updateInterest(neighborIndex, false);
+		// if (requestPiece.isEmpty())
+		// syncinfo.updateInterest(neighborIndex, false);
 	}
 
 	private boolean checkInterest() {
-		return syncinfo.interest(neighborIndex);
-		// BitSet hostBF=syncinfo.getBitfield();
-		// BitSet neighborBF=neighbor.getBitfield();
-		// hostBF.and(neighborBF);
-		// if(hostBF.equals(neighborBF)) return false;
-		// return true;
+		BitSet hostBF = syncinfo.getBitfield();
+		BitSet neighborBF = neighbor.getBitfield();
+		hostBF.and(neighborBF);
+		if (hostBF.equals(neighborBF))
+			return false;
+		return true;
 	}
 
 	private boolean handshakeCheck(HandShake hs) {
@@ -303,7 +299,8 @@ public class P2P extends Thread {
 		int pieceIndex;
 		while (true) {
 			pieceIndex = requestPiece.get(rd.nextInt(requestPiece.size()));
-			if(syncinfo.haspiecie(pieceIndex)) continue;
+//			if (syncinfo.haspiecie(pieceIndex))
+//				continue;
 			if (!syncinfo.getRequested(pieceIndex))
 				break;
 		}
@@ -365,8 +362,8 @@ public class P2P extends Thread {
 
 	private void sendMsgAllPeer(ActualMessage havepiece) {
 		for (Neighbor x : neighborInfo.values()) {
-//			if (x.isHandShaked())
-				x.send(havepiece);
+			// if (x.isHandShaked())
+			x.send(havepiece);
 			// String log="Peer "+hostID+" sent 'have'"+byte2int(havepiece.getPayload())+"
 			// to peer "+x.getPeerID();
 			// writelog(log);
