@@ -61,9 +61,9 @@ public class Host extends Thread {
 		Choke choke = new Choke(downloadRate, neighborInfo, syncinfo, common, hostID, peerinfo);
 		choke.start();
 		VirtualServer vs = new VirtualServer();
-		if (hostIndex < peerinfo.getAmount() - 1) {
-			vs.start();
-		}
+		// if (hostIndex < peerinfo.getAmount() - 1) {
+		vs.start();
+		// }
 		while (true) {
 			syncinfo.resetRequested();
 			try {
@@ -83,9 +83,9 @@ public class Host extends Thread {
 			e1.printStackTrace();
 		}
 		choke.stopRunning();
-		if (hostIndex < peerinfo.getAmount() - 1) {
-			vs.stopRunning();
-		}
+		// if (hostIndex < peerinfo.getAmount() - 1) {
+		vs.stopRunning();
+		// }
 		for (Neighbor n : neighborInfo.values())
 			n.closeConnection();
 		if (!hasFile)
