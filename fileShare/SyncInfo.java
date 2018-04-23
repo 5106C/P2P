@@ -45,9 +45,9 @@ public class SyncInfo {
 	}
 	
 	public boolean getRequested(int pieceIndex) {
-//		synchronized(requested) {
+		synchronized(requested) {
 			return requested[pieceIndex];
-//		}
+		}
 	}
 	
 	public BitSet getCompletedPeers() {

@@ -120,7 +120,7 @@ public class Choke extends Thread {
 						isChoke[i] = true;
 						ActualMessage msg = new ActualMessage(1, 0, null);
 						sendMessage(msg, i);
-						writelog("choked peer " + peerinfo.getPeerID(i));
+//						writelog("choked peer " + peerinfo.getPeerID(i));
 						logFlag = 1;
 					}
 				}
@@ -128,14 +128,14 @@ public class Choke extends Thread {
 				// choose high speed to unchoke
 				for (int i = 0; i < numOfPreferedNerghbor && i < preferNeighbor.size(); i++) {
 					int index = preferNeighbor.get(i);
-					if (isChoke[index]) {
-						ActualMessage msg = new ActualMessage(1, 1, null);
-						sendMessage(msg, index);
-						// waiting for request message from i;
-						isChoke[index] = false;
-						writelog("unchoked peer " + peerinfo.getPeerID(index));
-						logFlag = 1;
-					}
+					// if (isChoke[index]) {
+					ActualMessage msg = new ActualMessage(1, 1, null);
+					sendMessage(msg, index);
+					// waiting for request message from i;
+					isChoke[index] = false;
+//					writelog("unchoked peer " + peerinfo.getPeerID(index));
+					logFlag = 1;
+					// }
 				}
 
 				// writelog the current unchokeList
@@ -178,7 +178,8 @@ public class Choke extends Thread {
 						isChoke[optIndex] = false;
 						writelog("Peer " + hostID + " has the optimistically unchoked neighbor "
 								+ peerinfo.getPeerID(optIndex));
-//						System.out.println("[" + count + "]" + " optimistically unchoke peer" + optIndex);
+						// System.out.println("[" + count + "]" + " optimistically unchoke peer" +
+						// optIndex);
 					}
 				}
 
@@ -190,7 +191,7 @@ public class Choke extends Thread {
 					// send chock to peer index;
 					sendMessage(msg, preOptIndex);
 					isChoke[preOptIndex] = true;
-					writelog( " choked peer " + peerinfo.getPeerID(preOptIndex));
+					writelog(" choked peer " + peerinfo.getPeerID(preOptIndex));
 				}
 
 				// reset preOptIndex

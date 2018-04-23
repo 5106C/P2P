@@ -176,6 +176,6 @@ public class Host extends Thread {
 		P2P p2p = new P2P(common, peerinfo, syncinfo, hostID, index, downloadRate, neighborInfo, true);
 		neighbor.setP2P(p2p);
 		p2p.start();
-		System.out.println("peer " + hostID + "makes a connection to peer " + peerID);
+//		System.out.println("peer " + hostID + " makes a connection to peer " + peerID);
 	}
 }

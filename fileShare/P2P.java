@@ -60,9 +60,8 @@ public class P2P extends Thread {
 	public void run() {
 		if (handshakefirst) {
 			creatnewhandshake();
-			System.out.println(hostID + "send my handshake to " + neighborID); // neighborID,
-																				// peerID
-			writelog(hostID + "send my handshake to " + neighborID);
+			System.out.println(hostID + " send handshake to " + neighborID);
+			writelog("Peer " + hostID + " makes a connection to peer " + neighborID);
 		}
 		while (running) {
 			Object receivedMessage = null;
@@ -75,7 +74,7 @@ public class P2P extends Thread {
 				if (!handshakefirst) {
 					creatnewhandshake();
 					System.out.println(hostID + " send handshake to " + neighborID);
-					writelog(hostID + " send handshake to " + neighborID);
+					writelog("Peer " + hostID + " is connetcted form peer " + neighborID);
 				}
 				int type = 5;
 				byte[] payload = bits2byte(syncinfo.getBitfield());
@@ -89,13 +88,13 @@ public class P2P extends Thread {
 				// choke
 				if (msg.getType() == 0) {
 					ischoked = true;
-					String log = "Peer " + hostID + " is choked by Peer " + this.neighborID;
+					String log = "Peer " + hostID + " is choked by " + this.neighborID;
 					writelog(log);
 				}
 				// unchoke
 				else if (msg.getType() == 1) {
 					ischoked = false;
-					String log = "Peer " + hostID + " is unchoked by Peer " + this.neighborID;
+					String log = "Peer " + hostID + " is unchoked by " + this.neighborID;
 					writelog(log);
 					int pieceIndex = choosePiece();
 					byte[] payload = int2byte(pieceIndex);
@@ -110,29 +109,28 @@ public class P2P extends Thread {
 				// interested
 				else if (msg.getType() == 2) {
 					syncinfo.updateInterested(neighborIndex, true);
-					String log = "Peer " + hostID + " received the 'interested' from" + this.neighborID;
+					String log = "Peer " + hostID + " received the 'interested' messsage from " + this.neighborID;
 					writelog(log);
 				}
 				// not interested
 				else if (msg.getType() == 3) {
 					syncinfo.updateInterested(neighborIndex, false);
-					String log = "Peer " + hostID + " received the 'not interested' from" + this.neighborID;
+					String log = "Peer " + hostID + " received the 'not interested' message from " + this.neighborID;
 					writelog(log);
 				}
 				// have
 				else if (msg.getType() == 4) {
 					int pieceIndex = byte2int(msg.getPayload());
 					neighbor.updateBitfield(pieceIndex);
-					String log = "Peer " + hostID + " received the 'have' message from Peer " + neighborID
+					String log = "Peer " + hostID + " received the 'have' message from " + neighborID
 							+ " for the piece " + pieceIndex;
 					writelog(log);
 					if (neighbor.isComplete())
 						syncinfo.updateCompletedPeers(neighborIndex);
+
 					if (!syncinfo.haspiecie(pieceIndex)) {
 						requestPiece.add(pieceIndex);
-						if (syncinfo.interest(neighborIndex))
-							continue;
-						syncinfo.updateInterest(neighborIndex, true);
+						// syncinfo.updateInterest(neighborIndex, true);
 						ActualMessage interested = new ActualMessage(1, 2, null);
 						sendMsg(interested);
 					}
@@ -156,7 +154,7 @@ public class P2P extends Thread {
 				// request
 				else if (msg.getType() == 6) {
 					int pieceIndex = byte2int(msg.getPayload());
-					String log = "received a request " + pieceIndex + " from peer " + neighborID;
+					String log = "received a request " + pieceIndex + " from " + neighborID;
 					writelog(log);
 					// check if neighbor choked
 					if (!syncinfo.getIsChoke()[this.neighborIndex]) {
@@ -182,6 +180,7 @@ public class P2P extends Thread {
 							// int length = payload.length+1;
 							// ActualMessage bitfield = new ActualMessage(length, type, pl);
 							// sendMsg(bitfield);
+							writelog("Peer "+hostID+" has downloaded the complete file");
 							syncinfo.updateCompletedPeers(hostIndex);
 							continue;
 						}
@@ -299,8 +298,8 @@ public class P2P extends Thread {
 		int pieceIndex;
 		while (true) {
 			pieceIndex = requestPiece.get(rd.nextInt(requestPiece.size()));
-//			if (syncinfo.haspiecie(pieceIndex))
-//				continue;
+			// if (syncinfo.haspiecie(pieceIndex))
+			// continue;
 			if (!syncinfo.getRequested(pieceIndex))
 				break;
 		}
@@ -343,7 +342,7 @@ public class P2P extends Thread {
 
 	private void writelog(String log) {
 
-		String logname = filePath + "log_peer_" + hostID + ".log";
+		String logname = System.getProperty("user.dir") + File.separator + "log_peer_" + hostID + ".log";
 		try {
 			SimpleDateFormat time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String logtime = time.format(new Date().getTime());

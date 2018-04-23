@@ -14,6 +14,7 @@ public class Neighbor {
 	private int numofpiece;
 	private Socket connection;
 	private P2P p2p;
+//	private boolean handshaked;
 	ObjectInputStream in;
 	ObjectOutputStream out;
 
@@ -28,9 +29,17 @@ public class Neighbor {
 		this.in = in;
 		this.out = out;
 		bitfield = new BitSet(numofpiece);
+//		handshaked=false;
 		if (peerinfo.HasFile(index))
 			bitfield.flip(0, numofpiece);
 	}
+	
+//	public boolean isHandShaked() {
+//		return handshaked;
+//	}
+//	public void updateHandShake() {
+//			handshaked=true;
+//	}
 
 	public int getPeerID() {
 		return peerID;
